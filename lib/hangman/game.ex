@@ -135,13 +135,23 @@ Here's this module being exercised from an iex session:
   @type ch    :: binary
   @type optional_ch :: ch | nil
 
+
+
+
+
+
   @doc """
   Run a game of Hangman with our user. Use the dictionary to
   find a random word, and then let the user make guesses.
   """
+# defmodule state do
+#        defstruct :word ,:won ,:lost ,:good_guess ,:bad_guess
+#  end
+
 
   @spec new_game :: state
   def new_game do
+   state = %{:word => "shashi", :turnLeft => 10, :guess => ""}
   end
 
 
@@ -152,6 +162,7 @@ Here's this module being exercised from an iex session:
   """
   @spec new_game(binary) :: state
   def new_game(word) do
+  state = %{:word => word, :turnLeft => 10}
   end
 
 
@@ -177,8 +188,18 @@ Here's this module being exercised from an iex session:
 
   @spec make_move(state, ch) :: { state, atom, optional_ch }
   def make_move(state, guess) do
+  if(Map.get(state,:turnsLeft) > 0) do
+  if String.contains(Map.get(state,:word),guess) do
+    state = %{state | :status => "good_guess"}
+  #  guess = %{guess | :guess => guess <> :ch }
+  else
+    state = %{state | :status => "bad_guess"}
+   # guess = %{guess | :guess => guess <> ch }
+   end
+  else
+  state = %{state | :status => "lost"}
   end
-
+end
 
   @doc """
   `len = Hangman.Game.word_length(game)`
@@ -187,6 +208,8 @@ Here's this module being exercised from an iex session:
   """
   @spec word_length(state) :: integer
   def word_length(%{ word: word }) do
+  String.length(Map.get(%{ word: word },:word))
+  #String.length(Map.get(state,:word))
   end
 
   @doc """
@@ -199,6 +222,7 @@ Here's this module being exercised from an iex session:
 
   @spec letters_used_so_far(state) :: [ binary ]
   def letters_used_so_far(state) do
+   Map.get(state,:guess)
   end
 
   @doc """
@@ -211,6 +235,7 @@ Here's this module being exercised from an iex session:
 
   @spec turns_left(state) :: integer
   def turns_left(state) do
+  Map.get(state,:turnsLeft)
   end
 
   @doc """
@@ -222,10 +247,21 @@ Here's this module being exercised from an iex session:
   all letters. Letters and underscores are separated by spaces.
   """
 
+
   @spec word_as_string(state, boolean) :: binary
   def word_as_string(state, reveal \\ false) do
+  if(String.length(Map.get(state,:guess)) > 0) do
+    IO.puts "word_as_string....."
+    compareString(Map.get(state,:word), Map.get(state,:guess), String.length(Map.get(state,:word)), 0)
+   end
+
   end
 
+
+    def compareString([wordh|wordt], [guesseh|guesset], size, index) do
+     if wordh == guesseh, do: List.insert_at(:newList,index,wordh), else: List.insert_at(:newList,index,"-")
+     compareString(wordt,guesset,size-1,index+1);
+    end
   ###########################
   # end of public interface #
   ###########################
